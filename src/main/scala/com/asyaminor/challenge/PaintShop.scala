@@ -6,6 +6,9 @@ import scala.io.Source
   * Created by eunlu on 12/08/2016.
   */
 object PaintShop {
+
+  def fixThePaintBucket(bucket: List[Paint], customerList: List[String]): Unit = ???
+
   def main(args: Array[String]) {
     println("Hello PaintShop!")
 
@@ -16,9 +19,18 @@ object PaintShop {
       val fileName = args(0)
       println(s"file name provided: $fileName")
 
-      for (line <- Source.fromFile(fileName).getLines()) {
+      val inputLines = Source.fromFile(fileName).getLines().toList
 
-      }
+      require(inputLines.nonEmpty)
+
+      val colorLength = inputLines(0).toInt
+      val customerList = inputLines.tail
+
+      val bucket = List.fill(colorLength)(EmptyCan())
+
+      customerList.foreach(customer => println(customer))
+
+      fixThePaintBucket(bucket, customerList)
     }
   }
 }
