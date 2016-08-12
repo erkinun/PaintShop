@@ -5,7 +5,7 @@ package com.asyaminor.challenge
   */
 abstract class Paint
 case class EmptyCan() extends Paint
-case class ProducedPaint(typePaint: PaintType)
+case class ProducedPaint(typePaint: PaintType) extends Paint
 abstract class PaintType
 case class Matte() extends PaintType
 case class Gloss() extends PaintType
