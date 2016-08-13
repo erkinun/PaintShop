@@ -1,3 +1,4 @@
+import com.asyaminor.challenge.PaintShopV2.Bucket
 import com.asyaminor.challenge._
 val cstStr = "1 M 3 G 5 G"
 val input = cstStr.split(" ").toList
@@ -45,7 +46,7 @@ def decreaseLikes(likes: List[Likes], index: Int): List[Likes] = {
   val current = likes(index)
   println(current)
   if (current < 1) {
-    throw new NoSolutionCanBeFound()
+    //throw new NoSolutionCanBeFound()
   }
 
   likes.updated(index, current - 1)
@@ -53,3 +54,14 @@ def decreaseLikes(likes: List[Likes], index: Int): List[Likes] = {
 
 increaseLikes(likes, 0)
 val newLikes= decreaseLikes(likes, 0)
+implicit class BucketPrint(bucket: Bucket) {
+  def printBucket = bucket.foldLeft("")((str, paint) => paint.typePaint.toString + " " + str)
+}
+val bucket = List(ProducedPaint(Matte()), ProducedPaint(Matte()))
+
+Matte().toString
+
+println("printme")
+println(bucket.printBucket)
+
+val newBucket = bucket.updated(0, ProducedPaint(Gloss()))
