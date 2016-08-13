@@ -20,7 +20,6 @@ object PaintShopV2 {
   }
 
 
-
   def fixThePaintBucket(bucket: Bucket, customerList: List[String]): Bucket = {
     def turnIntoTupleList(input: List[String]): Customer = {
 
@@ -53,7 +52,7 @@ object PaintShopV2 {
 
     def customersOfPref(color: Int, paintType: PaintType, choices: Choices): Option[List[Int]] = {
       val key = color + paintType.toString
-      Some(choices(key))
+      choices.get(key)
     }
 
     def makePeopleUnhappy(color: Int, paintType: PaintType, choices: Choices, likes: List[Likes]): List[Likes] = {
@@ -74,9 +73,32 @@ object PaintShopV2 {
       }
     }
 
+    def canWeMakeUnhappy(index: Likes, choices: Choices, likes: List[Likes]): Boolean = {
+      // we are only turning to Gloss for getting cheaper
+      customersOfPref(index, Gloss(), choices) match {
+        case Some(people) => people.count(person => likes(person) > 1) == people.size
+        case None => true
+      }
+    }
+
+    def makeItCheaper(bucket: Bucket, newBucket: Bucket,
+                      choices: Choices, likes: List[Likes], index: Int): Bucket = bucket match {
+      case Nil => newBucket
+      case paint :: rest =>
+        if (paint.typePaint == Matte() && canWeMakeUnhappy(index, choices, likes)) {
+          val currentLikes = makePeopleUnhappy(index, Gloss(), choices, likes)
+          makeItCheaper(rest, newBucket.updated(index, ProducedPaint(Gloss())), choices, currentLikes, index + 1)
+        }
+        else {
+          makeItCheaper(rest, newBucket, choices, likes, index + 1)
+        }
+    }
+
     def solveForCustomer(cust: Customer, bucket: Bucket,
                          choices: Choices,
                          likes: List[Likes], index: Likes): (Bucket, Choices, List[Likes]) = {
+
+      def getPaintFromBucket(bucket: Bucket, color: Int) = bucket(color - 1).typePaint
 
       cust match {
         case Nil => (bucket, choices, likes)
@@ -85,15 +107,15 @@ object PaintShopV2 {
           val color = pref._1
           val paintType = getPaintType(pref._2)
 
-          if (bucket(color).typePaint == paintType) {
+          if (getPaintFromBucket(bucket, color) == paintType) {
             solveForCustomer(otherPrefs, bucket,
               recordCustomerPref(choices, index, paintType, color),
               increaseLikes(likes, index), index)
           }
           else {
-            val likesNew = makePeopleUnhappy(color, bucket(color).typePaint, choices, likes)
-            solveForCustomer(otherPrefs, bucket, recordCustomerPref(choices, index, paintType, color),
-              increaseLikes(likesNew, index), index)
+            val likesNew = makePeopleUnhappy(color, getPaintFromBucket(bucket, color), choices, likes)
+            solveForCustomer(otherPrefs, bucket.updated(index, ProducedPaint(paintType)), recordCustomerPref(choices, index, paintType, color),
+              increaseLikes(likesNew, index), index + 1)
           }
       }
     }
@@ -110,7 +132,10 @@ object PaintShopV2 {
     def tryToSolve(bucket: Bucket, choices: Choices, likes: List[Likes], customerList: List[Customer],
                    index: Int): Bucket = {
       customerList match {
-        case Nil => bucket //we can handle the reductions here!!! //TODO also check if there
+        case Nil =>
+          val revisedBucket = makeItCheaper(bucket, newBucket = bucket, choices, likes, index = 0)
+          //bucket //we can handle the reductions here!!! //TODO also check if there
+          revisedBucket
         case cust :: rest =>
           val (bucketN, choicesN, likesN) = solveForCustomer(cust, bucket, choices, likes, index)
           tryToSolve(bucketN, choicesN, likesN, rest, index + 1)
