@@ -100,6 +100,9 @@ object PaintShopV2 {
 
       def getPaintFromBucket(bucket: Bucket, color: Int) = bucket(color - 1).typePaint
 
+      val prefCount = cust.size
+      println(s"trying to solve for customer with index: $index, customer has $prefCount preferences left")
+
       cust match {
         case Nil => (bucket, choices, likes)
         case pref :: otherPrefs =>
@@ -115,7 +118,7 @@ object PaintShopV2 {
           else {
             val likesNew = makePeopleUnhappy(color, getPaintFromBucket(bucket, color), choices, likes)
             solveForCustomer(otherPrefs, bucket.updated(index, ProducedPaint(paintType)), recordCustomerPref(choices, index, paintType, color),
-              increaseLikes(likesNew, index), index + 1)
+              increaseLikes(likesNew, index), index)
           }
       }
     }
@@ -148,9 +151,6 @@ object PaintShopV2 {
       case Nil => bucket
       case cust :: rest => tryToSolve(bucket, choices, likesByCustomers, sortedPrefs, 0)
     }
-
-    //handle reductions and check for finished solution
-    throw new NotImplementedError("reductions have to be handled")
   }
 
   def main(args: Array[String]) {

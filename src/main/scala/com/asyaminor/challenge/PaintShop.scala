@@ -67,29 +67,29 @@ object PaintShop {
     }
   }
 
-  def main(args: Array[String]) {
-    println("Hello PaintShop!")
-
-    if (args.length == 0) {
-      println("Filename must be supplied from the command line")
-    }
-    else {
-      val fileName = args(0)
-      println(s"file name provided: $fileName")
-
-      val inputLines = Source.fromFile(fileName).getLines().toList
-
-      require(inputLines.nonEmpty)
-
-      val colorLength = inputLines(0).toInt
-      val customerList = inputLines.tail
-
-      val bucket = List.fill(colorLength)(ProducedPaint(Gloss()))
-
-      val newBucket = fixThePaintBucket(bucket, customerList)
-
-      //replace it with toString
-      newBucket foreach(paint => println(paint))
-    }
-  }
+//  def main(args: Array[String]) {
+//    println("Hello PaintShop!")
+//
+//    if (args.length == 0) {
+//      println("Filename must be supplied from the command line")
+//    }
+//    else {
+//      val fileName = args(0)
+//      println(s"file name provided: $fileName")
+//
+//      val inputLines = Source.fromFile(fileName).getLines().toList
+//
+//      require(inputLines.nonEmpty)
+//
+//      val colorLength = inputLines(0).toInt
+//      val customerList = inputLines.tail
+//
+//      val bucket = List.fill(colorLength)(ProducedPaint(Gloss()))
+//
+//      val newBucket = fixThePaintBucket(bucket, customerList)
+//
+//      //replace it with toString
+//      newBucket foreach(paint => println(paint))
+//    }
+//  }
 }
