@@ -41,7 +41,7 @@ object PaintShop {
     * Helper implicit to add a printing method to type Bucket
    */
   implicit class BucketPrint(bucket: Bucket) {
-    def printBucket = bucket.foldLeft("")((str, paint) => str + " " + paint.typePaint.toString)
+    def printBucket = bucket.foldLeft("")((str, paint) => str + " " + paint.typePaint.toString).trim
   }
 
   def fixThePaintBucket(bucket: Bucket, customerList: List[String]): Bucket = {
@@ -138,6 +138,17 @@ object PaintShop {
       }
     }
 
+    /**
+      *
+      * @param index
+      * @param choices
+      * @param likes
+      * @return true/false
+      *         we check people with a given color pref,
+      *         if all the people who prefers the color combination
+      *         has more than 1 like, we return true
+      *         else false
+      */
     def canWeMakeUnhappy(index: Likes, choices: Choices, likes: List[Likes]): Boolean = {
       // we are only turning to Gloss for getting cheaper
 
@@ -146,9 +157,7 @@ object PaintShop {
       customersOfPref(index + 1, Matte(), choices) match {
         case Some(people) =>
           //println(s"people for matte on index ${index + 1} count is: " + people.size)
-          val filteredPeople = people.count{person =>
-            //println(s"person number $person how many likes they have: ${likes(person)} with all likes ${likes}")
-            likes(person) > 1}
+          val filteredPeople = people.count{person => likes(person) > 1}
           filteredPeople == people.size
         case None => true
       }
@@ -283,12 +292,7 @@ object PaintShop {
     else {
       val fileName = args(0)
 
-      val inputLines = Source.fromFile(fileName).getLines().toList
-
-      require(inputLines.nonEmpty)
-
-      val colorLength = inputLines(0).toInt
-      val customerList = inputLines.tail
+      val (colorLength: Int, customerList: List[String]) = parseInputFile(fileName)
 
       val bucket = List.fill(colorLength)(ProducedPaint(Gloss()))
 
@@ -303,5 +307,15 @@ object PaintShop {
       }
 
     }
+  }
+
+  def parseInputFile(fileName: String): (Int, List[String]) = {
+    val inputLines = Source.fromFile(fileName).getLines().toList
+
+    require(inputLines.nonEmpty)
+
+    val colorLength = inputLines(0).toInt
+    val customerList = inputLines.tail
+    (colorLength, customerList)
   }
 }
