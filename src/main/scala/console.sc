@@ -1,4 +1,4 @@
-import com.asyaminor.challenge.PaintShopV2.Bucket
+import com.asyaminor.challenge.PaintShop.Bucket
 import com.asyaminor.challenge._
 val cstStr = "1 M 3 G 5 G"
 val input = cstStr.split(" ").toList
