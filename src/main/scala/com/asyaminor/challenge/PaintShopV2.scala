@@ -55,18 +55,18 @@ object PaintShopV2 {
 
     def customersOfPref(color: Int, paintType: PaintType, choices: Choices): Option[List[Int]] = {
       val key = color + paintType.toString
-      println(s"key: $key and choices: " + choices)
+      //println(s"key: $key and choices: " + choices)
       choices.get(key)
     }
 
     def makePeopleHappy(color: Int, paintType: PaintType, choices: Choices, likes: List[Likes]): List[Likes] = {
 
-      println(s"making people happy with paint $paintType")
+      //println(s"making people happy with paint $paintType")
 
       customersOfPref(color + 1, paintType, choices) match {
         //customersOfPref(color, Matte(), choices) match {
         case Some(people) =>
-          println(s"found happy people: $people")
+          //println(s"found happy people: $people")
           people.foldLeft(likes)((likeS, person) => increaseLikes(likeS, person))
         case None => likes
       }
@@ -74,7 +74,7 @@ object PaintShopV2 {
 
     def makePeopleUnhappy(color: Int, paintType: PaintType, choices: Choices, likes: List[Likes]): List[Likes] = {
 
-      println(s"making people unhappy with paint $paintType")
+      //println(s"making people unhappy with paint $paintType")
 
       customersOfPref(color + 1, paintType, choices) match {
       //customersOfPref(color, Matte(), choices) match {
@@ -97,13 +97,13 @@ object PaintShopV2 {
     def canWeMakeUnhappy(index: Likes, choices: Choices, likes: List[Likes]): Boolean = {
       // we are only turning to Gloss for getting cheaper
 
-      println(s"looking for index: ${index + 1} with Matte choices")
+      //println(s"looking for index: ${index + 1} with Matte choices")
 
       customersOfPref(index + 1, Matte(), choices) match {
         case Some(people) =>
-          println(s"people for matte on index ${index + 1} count is: " + people.size)
+          //println(s"people for matte on index ${index + 1} count is: " + people.size)
           val filteredPeople = people.count{person =>
-            println(s"person number $person how many likes they have: ${likes(person)} with all likes ${likes}")
+            //println(s"person number $person how many likes they have: ${likes(person)} with all likes ${likes}")
             likes(person) > 1}
           filteredPeople == people.size
         case None => true
@@ -118,11 +118,11 @@ object PaintShopV2 {
         case Nil => (newBucket, likes)
         case paint :: rest =>
           if (paint.typePaint == Matte() && canWeMakeUnhappy(index, choices, likes)) {
-            println("found Matte paint and we're making people unhappier a bit")
+            //println("found Matte paint and we're making people unhappier a bit")
             val currentLikes = makePeopleUnhappy(index, Matte(), choices, likes)
-            println("unhappy people: " + currentLikes)
+            //println("unhappy people: " + currentLikes)
             val updatedLikes = makePeopleHappy(index, Gloss(), choices, currentLikes)
-            println("happier people: " + updatedLikes)
+            //println("happier people: " + updatedLikes)
             makeCheapInner(rest, newBucket.updated(index, ProducedPaint(Gloss())), choices, updatedLikes, index + 1)
           }
           else {
@@ -132,8 +132,8 @@ object PaintShopV2 {
 
       val (updatedBucket, updatedLikes) = makeCheapInner(bucket, newBucket = bucket, choices, likes, index)
 
-      println("end of iteration: bucket: " + updatedBucket.printBucket)
-      println("end of iteration bucket earlier: " + bucket.printBucket)
+      //println("end of iteration: bucket: " + updatedBucket.printBucket)
+      //println("end of iteration bucket earlier: " + bucket.printBucket)
 
       if (updatedBucket.equals(bucket)) {
         updatedBucket
@@ -153,8 +153,8 @@ object PaintShopV2 {
       }
 
       val prefCount = cust.size
-      println(s"trying to solve for customer with index: $index, customer has $prefCount preferences left")
-      println("current likes: " + likes)
+      //println(s"trying to solve for customer with index: $index, customer has $prefCount preferences left")
+      //println("current likes: " + likes)
 
       cust match {
         case Nil => (bucket, choices, likes)
@@ -163,7 +163,7 @@ object PaintShopV2 {
           val color = pref._1
           val paintType = getPaintType(pref._2)
 
-          println(s"customer has pref for color: $color and paint type: $paintType")
+        //  println(s"customer has pref for color: $color and paint type: $paintType")
 
           if (getPaintFromBucket(bucket, color) == paintType || paintType == Gloss()) {
 
@@ -180,11 +180,11 @@ object PaintShopV2 {
 
           }
           else {
-            println(s"different type of colors for color: $color!!!")
-            println("bucket before switching paint types: " + bucket.printBucket)
+          //  println(s"different type of colors for color: $color!!!")
+//            println("bucket before switching paint types: " + bucket.printBucket)
             val bucketNew = bucket.updated(color - 1, ProducedPaint(paintType))
 
-            println("bucket after switching paint types: " + bucketNew.printBucket)
+//            println("bucket after switching paint types: " + bucketNew.printBucket)
             val likesNew = makePeopleUnhappy(color - 1, getPaintFromBucket(bucket, color), choices, likes)
             solveForCustomer(otherPrefs, bucketNew , recordCustomerPref(choices, index, paintType, color),
               increaseLikes(likesNew, index), index)
@@ -206,13 +206,13 @@ object PaintShopV2 {
       customerList match {
         case Nil =>
           val bucketString = bucket.printBucket
-          println(s"before reduction: $bucketString")
+//          println(s"before reduction: $bucketString")
           val revisedBucket = makeItCheaper(bucket, choices, likes, index = 0)
           //bucket //we can handle the reductions here!!! //TODO also check if there
           revisedBucket
         case cust :: rest =>
           val (bucketN, choicesN, likesN) = solveForCustomer(cust, bucket, choices, likes, index)
-          println("current bucket: " + bucketN.printBucket)
+//          println("current bucket: " + bucketN.printBucket)
           tryToSolve(bucketN, choicesN, likesN, rest, index + 1)
       }
     }
@@ -228,12 +228,14 @@ object PaintShopV2 {
   def main(args: Array[String]) {
     println("Hello PaintShop!")
 
+    //TODO think about corner cases
+    //TODO handle exception to print the required string
+
     if (args.length == 0) {
       println("Filename must be supplied from the command line")
     }
     else {
       val fileName = args(0)
-      println(s"file name provided: $fileName")
 
       val inputLines = Source.fromFile(fileName).getLines().toList
 
@@ -246,8 +248,6 @@ object PaintShopV2 {
 
       val newBucket = fixThePaintBucket(bucket, customerList)
 
-      //replace it with toString
-      //newBucket foreach(paint => println(paint))
       println(newBucket.printBucket)
     }
   }
