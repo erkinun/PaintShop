@@ -1,5 +1,7 @@
 package com.asyaminor.challenge
 
+import java.io.File
+
 import scala.io.Source
 
 /**
@@ -310,6 +312,9 @@ object PaintShop {
   }
 
   def parseInputFile(fileName: String): (Int, List[String]) = {
+
+    require(new File(fileName).exists())
+
     val inputLines = Source.fromFile(fileName).getLines().toList
 
     require(inputLines.nonEmpty)
