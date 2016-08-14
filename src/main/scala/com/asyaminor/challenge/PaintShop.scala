@@ -21,6 +21,7 @@ import scala.io.Source
   * if bucket changed, then iterate until bucket finishes changing
   * that's the perfect bucket
   *
+  * Note: simple functions are not documented
   */
 object PaintShop {
 
@@ -36,12 +37,16 @@ object PaintShop {
     case _ => throw new IllegalArgumentException
   }
 
+  /**
+    * Helper implicit to add a printing method to type Bucket
+   */
   implicit class BucketPrint(bucket: Bucket) {
     def printBucket = bucket.foldLeft("")((str, paint) => str + " " + paint.typePaint.toString)
   }
 
   def fixThePaintBucket(bucket: Bucket, customerList: List[String]): Bucket = {
-    def turnIntoTupleList(input: List[String]): Customer = {
+
+    def turnIntoCustomer(input: List[String]): Customer = {
 
       def turnInner(input: List[String], tuples: List[Preference]): List[(Int, Char)] = {
         input match {
@@ -60,6 +65,14 @@ object PaintShop {
       val current = likes(index)
       likes.updated(index, current + 1)
     }
+    /**
+      *
+      * @param likes
+      * @param index
+      * @return updated list of likes
+      *         This method also has the ability to finish the simulation
+      *         which may be a bad idea that can be refactored later on
+      */
     def decreaseLikes(likes: List[Likes], index: Int): List[Likes] = {
       val current = likes(index)
 
@@ -69,13 +82,27 @@ object PaintShop {
 
       likes.updated(index, current - 1)
     }
-
+    /**
+      *
+      * @param color
+      * @param paintType
+      * @param choices
+      * @return an option of people who might prefer the particular color with paint type
+      */
     def customersOfPref(color: Int, paintType: PaintType, choices: Choices): Option[List[Int]] = {
       val key = color + paintType.toString
       //println(s"key: $key and choices: " + choices)
       choices.get(key)
     }
-
+    /**
+      *
+      * @param color
+      * @param paintType
+      * @param choices
+      * @param likes
+      * @return updated list of likes using fold for iteration
+      *         if we have people that like the color and painttype, we will make them happier
+      */
     def makePeopleHappy(color: Int, paintType: PaintType, choices: Choices, likes: List[Likes]): List[Likes] = {
 
       //println(s"making people happy with paint $paintType")
@@ -135,11 +162,8 @@ object PaintShop {
         case Nil => (newBucket, likes)
         case paint :: rest =>
           if (paint.typePaint == Matte() && canWeMakeUnhappy(index, choices, likes)) {
-            //println("found Matte paint and we're making people unhappier a bit")
             val currentLikes = makePeopleUnhappy(index, Matte(), choices, likes)
-            //println("unhappy people: " + currentLikes)
             val updatedLikes = makePeopleHappy(index, Gloss(), choices, currentLikes)
-            //println("happier people: " + updatedLikes)
             makeCheapInner(rest, newBucket.updated(index, ProducedPaint(Gloss())), choices, updatedLikes, index + 1)
           }
           else {
@@ -209,7 +233,7 @@ object PaintShop {
     }
 
     val preferenceList = customerList map
-      {customerString => turnIntoTupleList(customerString.split(" ").toList)}
+      {customerString => turnIntoCustomer(customerString.split(" ").toList)}
 
     val sortedPrefs = preferenceList sortBy(pref => pref.size)
     //init likes list
