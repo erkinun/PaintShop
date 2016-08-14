@@ -229,7 +229,6 @@ object PaintShopV2 {
     println("Hello PaintShop!")
 
     //TODO think about corner cases
-    //TODO handle exception to print the required string
 
     if (args.length == 0) {
       println("Filename must be supplied from the command line")
@@ -246,9 +245,16 @@ object PaintShopV2 {
 
       val bucket = List.fill(colorLength)(ProducedPaint(Gloss()))
 
-      val newBucket = fixThePaintBucket(bucket, customerList)
+      try {
+        val newBucket = fixThePaintBucket(bucket, customerList)
 
-      println(newBucket.printBucket)
+        println(newBucket.printBucket)
+      }
+      catch {
+        case nsfe: NoSolutionCanBeFound => println("No solution exists")
+        case t: Throwable => println("unknown error" + t.getMessage )
+      }
+
     }
   }
 }
