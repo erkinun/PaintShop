@@ -154,6 +154,19 @@ object PaintShop {
       }
     }
 
+    /**
+      *
+      * @param bucket
+      * @param choices
+      * @param likes
+      * @param index
+      * @return update bucket
+      *         this method is where we try to reduce the price of bucket
+      *         we take a look at each Matte color, and try to convert it ot Gloss color
+      *         if the selector of Matte color has likes more than 1, we can convert it
+      *         the inner method is called as long as the old bucket and the reducted bucket
+      *         are different which means there might be still a chance to reduce its price
+      */
     def makeItCheaper(bucket: Bucket,
                       choices: Choices, likes: List[Likes], index: Int): Bucket = {
 
@@ -172,9 +185,6 @@ object PaintShop {
       }
 
       val (updatedBucket, updatedLikes) = makeCheapInner(bucket, newBucket = bucket, choices, likes, index)
-
-      //println("end of iteration: bucket: " + updatedBucket.printBucket)
-      //println("end of iteration bucket earlier: " + bucket.printBucket)
 
       if (updatedBucket.equals(bucket)) {
         updatedBucket
@@ -203,16 +213,16 @@ object PaintShop {
           val color = pref._1
           val paintType = getPaintType(pref._2)
 
-        //  println(s"customer has pref for color: $color and paint type: $paintType")
-
           if (getPaintFromBucket(bucket, color) == paintType || paintType == Gloss()) {
-
             if (getPaintFromBucket(bucket, color) == paintType) {
+              // we only increase happiness if there is a match
               solveForCustomer(otherPrefs, bucket,
                 recordCustomerPref(choices, index, paintType, color),
                 increaseLikes(likes, index), index)
             }
             else {
+              // if there is already a matte color and customer wanted gloss
+              // we can skip that for now, recording the selection though
               solveForCustomer(otherPrefs, bucket,
                 recordCustomerPref(choices, index, paintType, color),
                 likes, index)
@@ -220,11 +230,9 @@ object PaintShop {
 
           }
           else {
-          //  println(s"different type of colors for color: $color!!!")
-//            println("bucket before switching paint types: " + bucket.printBucket)
+            // this means we have matte color, we have to switch to that
             val bucketNew = bucket.updated(color - 1, ProducedPaint(paintType))
 
-//            println("bucket after switching paint types: " + bucketNew.printBucket)
             val likesNew = makePeopleUnhappy(color - 1, getPaintFromBucket(bucket, color), choices, likes)
             solveForCustomer(otherPrefs, bucketNew , recordCustomerPref(choices, index, paintType, color),
               increaseLikes(likesNew, index), index)
