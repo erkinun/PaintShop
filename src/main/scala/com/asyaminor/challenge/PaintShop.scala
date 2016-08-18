@@ -211,6 +211,8 @@ object PaintShop {
           }
       }
 
+      println(s"current choices before making cheaper: $choices")
+
       val (updatedBucket, updatedLikes) = makeCheapInner(bucket, newBucket = bucket, choices, likes, index)
 
       if (updatedBucket.equals(bucket)) {
@@ -247,21 +249,9 @@ object PaintShop {
 
           println(s"choice of customer: $pref")
 
-          if (getPaintFromBucket(bucket, color) == paintType || paintType == Gloss()) {
-            if (getPaintFromBucket(bucket, color) == paintType) {
-              // we only increase happiness if there is a match
-              solveForCustomer(otherPrefs, bucket,
-                recordCustomerPref(choices, index, paintType, color),
-                increaseLikes(likes, index), index)
-            }
-            else {
-              // if there is already a matte color and customer wanted gloss
-              // we can skip that for now, recording the selection though
-              solveForCustomer(otherPrefs, bucket,
-                recordCustomerPref(choices, index, paintType, color),
-                likes, index)
-            }
-
+          if (getPaintFromBucket(bucket, color) == paintType) {
+            solveForCustomer(otherPrefs, bucket,recordCustomerPref(choices, index, paintType, color),
+              increaseLikes(likes, index), index)
           }
           else {
 
@@ -297,8 +287,9 @@ object PaintShop {
       customerList match {
         case Nil =>
           val bucketString = bucket.printBucket
-//          println(s"before reduction: $bucketString")
+          println(s"before reduction: $bucketString")
           val revisedBucket = makeItCheaper(bucket, choices, likes, index = 0)
+          println(s"after reduction:  ${revisedBucket.printBucket}")
           //bucket //we can handle the reductions here!!! //TODO also check if there
           revisedBucket
         case cust :: rest =>
@@ -319,6 +310,9 @@ object PaintShop {
   def main(args: Array[String]) {
 
     //TODO think about corner cases
+    // TODO for 9-70 print the sorted list of customers last time and check
+    // TODO erase printlns again
+    // TODO can you make it simpler?
 
     if (args.length == 0) {
       println("Filename must be supplied from the command line")

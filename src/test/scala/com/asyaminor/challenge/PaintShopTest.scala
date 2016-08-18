@@ -73,6 +73,17 @@ class PaintShopTest extends FunSuite {
     assert(expectedOutput.equals(bucketResult.printBucket))
   }
 
+  test("9-70 must return the result of M M M G G M M G G") {
+    val (customerList: List[String], bucket: List[ProducedPaint]) = getBucketAndCustomers("inputs/input-9-70.txt")
+
+    val bucketResult = paintShop.fixThePaintBucket(bucket, customerList)
+
+    val expectedOutput = "M M M G G M M G G"
+
+    println(bucketResult.printBucket)
+    assert(expectedOutput.equals(bucketResult.printBucket))
+  }
+
   test("nosol must throw the result of No solution exists") {
     val (customerList: List[String], bucket: List[ProducedPaint]) = getBucketAndCustomers("inputs/nosol.txt")
 
